@@ -9,8 +9,7 @@ import {
 
 const runtime = async () => {
   const { browser, page } = await setupBrowser("https://iam.virginpulse.com/")
-  await sendMail()
-  return
+
   try {
     logger("Browser started, page navigated")
     await fillUsernamePasswordPage(page)
@@ -31,6 +30,7 @@ const runtime = async () => {
     logger(error.message)
   }
 
+  await sendMail()
   await browser.close()
 }
 
