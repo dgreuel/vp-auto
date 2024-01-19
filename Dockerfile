@@ -1,4 +1,4 @@
-FROM node:slim AS app
+FROM mcr.microsoft.com/playwright:v1.41.0-jammy AS app
 
 WORKDIR /tmp/app
 
