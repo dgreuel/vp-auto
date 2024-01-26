@@ -28,12 +28,14 @@ const runtime = async () => {
     await goToStatsPage(page)
 
     points = await goToHomePageAndGetPoints(page)
+    logger("Points: " + points)
   } catch (error: any) {
     logger("=== Automation failed ===")
     logger(error.message)
   }
 
   try {
+    logger("Attempting to send email")
     await sendMail(points)
     await browser.close()
   } catch (e) {

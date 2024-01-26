@@ -6,6 +6,7 @@ const logs = []
 export const sendMail = async (points: string) => {
   if (process.env.EMAIL_HOST && process.env.EMAIL_USER) {
     const transporter = nodemailer.createTransport({
+      name: process.env.EMAIL_TRANSPORT_NAME,
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
       secure: true,
