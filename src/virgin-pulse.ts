@@ -3,6 +3,13 @@ import { Page } from "playwright"
 import StealthPlugin from "puppeteer-extra-plugin-stealth"
 import { sleep, randomWaitTime, logger } from "./utils.js"
 
+export const detectModal = async (page: Page) => {
+  if (await page.locator("id=trophy-modal-close-btn")) {
+    logger("Trophy modal detected")
+    await page.locator("id=trophy-modal-close-btn").click()
+  }
+}
+
 export const setupBrowser = async (startingPage: string) => {
   chromium.use(StealthPlugin())
   const browser = await chromium.launch()
@@ -45,12 +52,16 @@ export const goToHomePageAndGetPoints = async (page: Page) => {
 }
 
 export const fillHealthyHabitsPage = async (page: Page) => {
+  await detectModal(page)
+
   if ((await page.locator("id=wake-up-with-water-input-container").count()) > 0) {
     logger("Wake up with water found")
     await page.locator("id=wake-up-with-water-input-container").getByText("Yes").click()
     await sleep(randomWaitTime())
     await page.screenshot({ path: "screenshots/post-water.png", fullPage: true })
   }
+
+  await detectModal(page)
   if ((await page.locator("id=get-some-sleep-input-container").count()) > 0) {
     logger("Get some sleep found")
     // random number between 6 9
@@ -63,6 +74,8 @@ export const fillHealthyHabitsPage = async (page: Page) => {
     await sleep(randomWaitTime())
     await page.screenshot({ path: "screenshots/post-sleep.png", fullPage: true })
   }
+
+  await detectModal(page)
   if ((await page.locator("id=steps-input-container").count()) > 0) {
     logger("Steps found")
     // random number between 2500 and 14000

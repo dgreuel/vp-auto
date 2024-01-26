@@ -1,40 +1,47 @@
 import nodemailer from "nodemailer"
+import { Message, SMTPClient } from "emailjs"
 import fs from "fs"
 
 const logs = []
 
 export const sendMail = async (points: string) => {
   if (process.env.EMAIL_HOST && process.env.EMAIL_USER) {
-    const transporter = nodemailer.createTransport({
-      name: process.env.EMAIL_TRANSPORT_NAME,
+    const client = new SMTPClient({
+      user: process.env.EMAIL_USER,
+      password: process.env.EMAIL_PASS,
       host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: true,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
+      port: parseInt(process.env.EMAIL_PORT),
+      ssl: true,
     })
+
     // create attachments array of screenshots
     const attachments = []
     fs.readdirSync("./screenshots").forEach((file) => {
       attachments.push({
-        filename: file,
+        type: "image/png",
+        name: file,
         path: `./screenshots/${file}`,
       })
     })
 
     // send email
-    const info = await transporter.sendMail({
+    const messageOpts = {
+      text: `Virgin Pulse Logs (${points}): \n` + logs.join("\n"), // plain text body
       from: process.env.EMAIL_USER, // sender address
       to: process.env.EMAIL_RECPT || process.env.EMAIL_USER, // list of receivers
       subject: `Virgin Pulse Stats: ${points}`, // Subject line
-      text: `Virgin Pulse Logs (${points}): \n` + logs.join("\n"), // plain text body
-      html: "<b>Virgin Pulse Logs: </b> <br />" + logs.join("<br />"), // html body
-      attachments,
-    })
+      attachment: attachments, // attachments
+    }
+    const message = new Message(messageOpts)
 
-    console.log("Message sent: %s", info.messageId)
+    try {
+      const msg = await client.sendAsync(message)
+      console.log(msg)
+    } catch (e) {
+      console.log("Failed to send email")
+      console.log(e)
+    }
+    // console.log("Message sent: %s", info.messageId)
   }
 }
 
