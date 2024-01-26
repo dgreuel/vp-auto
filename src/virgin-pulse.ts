@@ -35,6 +35,15 @@ export const goToStatsPage = async (page: Page) => {
   await page.screenshot({ path: "screenshots/stats-page.png", fullPage: true })
 }
 
+export const goToHomePageAndGetPoints = async (page: Page) => {
+  await page.goto("https://app.member.virginpulse.com/#/home")
+  await sleep(randomWaitTime())
+  await page.waitForSelector("id=earned-value")
+  const points = await page.locator("id=earned-value").innerText()
+
+  return points
+}
+
 export const fillHealthyHabitsPage = async (page: Page) => {
   if ((await page.locator("id=wake-up-with-water-input-container").count()) > 0) {
     logger("Wake up with water found")

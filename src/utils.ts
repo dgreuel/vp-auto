@@ -3,7 +3,7 @@ import fs from "fs"
 
 const logs = []
 
-export const sendMail = async () => {
+export const sendMail = async (points: string) => {
   if (process.env.EMAIL_HOST && process.env.EMAIL_USER) {
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
@@ -26,9 +26,9 @@ export const sendMail = async () => {
     // send email
     const info = await transporter.sendMail({
       from: process.env.EMAIL_USER, // sender address
-      to: process.env.EMAIL_USER, // list of receivers
-      subject: "Virgin Pulse Stats", // Subject line
-      text: "Virgin Pulse Logs: \n" + logs.join("\n"), // plain text body
+      to: process.env.EMAIL_RECPT || process.env.EMAIL_USER, // list of receivers
+      subject: `Virgin Pulse Stats: ${points}`, // Subject line
+      text: `Virgin Pulse Logs (${points}): \n` + logs.join("\n"), // plain text body
       html: "<b>Virgin Pulse Logs: </b> <br />" + logs.join("<br />"), // html body
       attachments,
     })

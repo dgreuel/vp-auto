@@ -5,11 +5,12 @@ import {
   goToHealthyHabitsPage,
   setupBrowser,
   goToStatsPage,
+  goToHomePageAndGetPoints,
 } from "./virgin-pulse.js"
 
 const runtime = async () => {
   const { browser, page } = await setupBrowser("https://iam.virginpulse.com/")
-
+  let points = "N/A"
   try {
     logger("Browser started, page navigated")
     await fillUsernamePasswordPage(page)
@@ -25,13 +26,19 @@ const runtime = async () => {
 
     await fillHealthyHabitsPage(page)
     await goToStatsPage(page)
+
+    points = await goToHomePageAndGetPoints(page)
   } catch (error: any) {
     logger("=== Automation failed ===")
     logger(error.message)
   }
 
-  await sendMail()
-  await browser.close()
+  try {
+    await sendMail(points)
+    await browser.close()
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 runtime()
