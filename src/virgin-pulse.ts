@@ -2,9 +2,10 @@ import { chromium } from "playwright-extra"
 import { Page } from "playwright"
 import StealthPlugin from "puppeteer-extra-plugin-stealth"
 import { sleep, randomWaitTime, logger } from "./utils.js"
+import HealthyHabitForms from './vp-healthy-habit-forms.js'
 
 export const detectModal = async (page: Page) => {
-  if (await page.locator("id=trophy-modal-close-btn")) {
+  if (await page.locator("id=trophy-modal-close-btn").isVisible()) {
     logger("Trophy modal detected")
     await page.locator("id=trophy-modal-close-btn").click()
   }
@@ -52,40 +53,9 @@ export const goToHomePageAndGetPoints = async (page: Page) => {
 }
 
 export const fillHealthyHabitsPage = async (page: Page) => {
-  await detectModal(page)
-
-  if ((await page.locator("id=wake-up-with-water-input-container").count()) > 0) {
-    logger("Wake up with water found")
-    await page.locator("id=wake-up-with-water-input-container").getByText("Yes").click()
-    await sleep(randomWaitTime())
-    await page.screenshot({ path: "screenshots/post-water.png", fullPage: true })
-  }
-
-  await detectModal(page)
-  if ((await page.locator("id=get-some-sleep-input-container").count()) > 0) {
-    logger("Get some sleep found")
-    // random number between 6 9
-    const randSleepHours = Math.floor(Math.random() * 10) + 6
-    await page
-      .locator("id=get-some-sleep-input-container")
-      .locator("id=sleepHours")
-      .pressSequentially(randSleepHours.toString())
-    await page.locator("id=track-sleep").click()
-    await sleep(randomWaitTime())
-    await page.screenshot({ path: "screenshots/post-sleep.png", fullPage: true })
-  }
-
-  await detectModal(page)
-  if ((await page.locator("id=steps-input-container").count()) > 0) {
-    logger("Steps found")
-    // random number between 2500 and 14000
-    const randSteps = Math.floor(Math.random() * 10000) + 2500
-    await page
-      .locator("id=steps-input-container")
-      .locator("id=healthyhabits-steps")
-      .pressSequentially(randSteps.toString())
-    await page.locator("id=track-steps").click()
-    await sleep(randomWaitTime())
-    await page.screenshot({ path: "screenshots/post-steps.png", fullPage: true })
+  // call each function in HealthyHabitForms
+  for (const func of HealthyHabitForms) {
+    await detectModal(page)
+    await func(page)
   }
 }
