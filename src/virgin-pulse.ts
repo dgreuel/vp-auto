@@ -4,10 +4,17 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth"
 import { sleep, randomWaitTime, logger } from "./utils.js"
 import HealthyHabitForms from './vp-healthy-habit-forms.js'
 
+// self catching for false positives
 export const detectModal = async (page: Page) => {
-  if (await page.locator("id=trophy-modal-close-btn").isVisible()) {
-    logger("Trophy modal detected")
-    await page.locator("id=trophy-modal-close-btn").click()
+  try {
+    const domElements = await page.locator("id=trophy-modal-close-btn").count()
+    const isVisible = await page.isVisible('id=trophy-modal-close-btn')
+    if (domElements > 0 && isVisible) {
+      logger("Trophy modal detected")
+      await page.locator("id=trophy-modal-close-btn").click()
+    }
+  } catch (error: any) {
+
   }
 }
 
@@ -55,7 +62,11 @@ export const goToHomePageAndGetPoints = async (page: Page) => {
 export const fillHealthyHabitsPage = async (page: Page) => {
   // call each function in HealthyHabitForms
   for (const func of HealthyHabitForms) {
-    await detectModal(page)
-    await func(page)
+    try {
+      await detectModal(page)
+      await func(page)
+    } catch(error: any) {
+      logger(`caught error: ${error.message}`)
+    }  
   }
 }
