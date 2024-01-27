@@ -11,6 +11,7 @@ import {
 const runtime = async () => {
   const { browser, page } = await setupBrowser("https://iam.virginpulse.com/")
   let points = "N/A"
+  
   try {
     logger("Browser started, page navigated")
     await fillUsernamePasswordPage(page)

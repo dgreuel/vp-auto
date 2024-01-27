@@ -16,13 +16,15 @@ export const sendMail = async (points: string) => {
 
     // create attachments array of screenshots
     const attachments = []
-    fs.readdirSync("./screenshots").forEach((file) => {
-      attachments.push({
-        type: "image/png",
-        name: file,
-        path: `./screenshots/${file}`,
+    if (fs.existsSync("./screenshots")) {
+      fs.readdirSync("./screenshots").forEach((file) => {
+        attachments.push({
+          type: "image/png",
+          name: file,
+          path: `./screenshots/${file}`,
+        })
       })
-    })
+    }
 
     // send email
     const messageOpts = {
@@ -42,6 +44,8 @@ export const sendMail = async (points: string) => {
       console.log(e)
     }
     // console.log("Message sent: %s", info.messageId)
+  } else {
+    console.log("No Valid Email Vars detected -- skipping...  ")
   }
 }
 
