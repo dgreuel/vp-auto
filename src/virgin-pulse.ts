@@ -2,20 +2,18 @@ import { chromium } from "playwright-extra"
 import { Page } from "playwright"
 import StealthPlugin from "puppeteer-extra-plugin-stealth"
 import { sleep, randomWaitTime, logger } from "./utils.js"
-import HealthyHabitForms from './vp-healthy-habit-forms.js'
+import HealthyHabitForms from "./vp-healthy-habit-forms.js"
 
 // self catching for false positives
 export const detectModal = async (page: Page) => {
   try {
     const domElements = await page.locator("id=trophy-modal-close-btn").count()
-    const isVisible = await page.isVisible('id=trophy-modal-close-btn')
+    const isVisible = await page.isVisible("id=trophy-modal-close-btn")
     if (domElements > 0 && isVisible) {
       logger("Trophy modal detected")
       await page.locator("id=trophy-modal-close-btn").click()
     }
-  } catch (error: any) {
-
-  }
+  } catch (error: any) {}
 }
 
 export const setupBrowser = async (startingPage: string) => {
@@ -30,8 +28,9 @@ export const setupBrowser = async (startingPage: string) => {
 }
 
 export const fillUsernamePasswordPage = async (page: Page) => {
-  await page.locator("id=username").pressSequentially(process.env.VP_USERNAME)
-  await page.locator("id=password").pressSequentially(process.env.VP_PASSWORD)
+  await page.locator("id=username-input").pressSequentially(process.env.VP_USERNAME)
+  await page.locator("id=continue-button").click()
+  await page.locator("id=password-input").pressSequentially(process.env.VP_PASSWORD)
 
   await page.locator("id=kc-login").click()
   await sleep(randomWaitTime())
@@ -39,19 +38,19 @@ export const fillUsernamePasswordPage = async (page: Page) => {
 }
 
 export const goToHealthyHabitsPage = async (page: Page) => {
-  await page.goto("https://app.member.virginpulse.com/#/healthyhabits")
+  await page.goto("https://app.personifyhealth.com/#/healthyhabits")
   await sleep(randomWaitTime())
   await page.screenshot({ path: "screenshots/healthy-habits.png", fullPage: true })
 }
 export const goToStatsPage = async (page: Page) => {
-  await page.goto("https://app.member.virginpulse.com/#/stats-page")
+  await page.goto("https://app.personifyhealth.com/#/stats-page")
   await sleep(randomWaitTime())
   await page.waitForSelector("id=steps-card")
   await page.screenshot({ path: "screenshots/stats-page.png", fullPage: true })
 }
 
 export const goToHomePageAndGetPoints = async (page: Page) => {
-  await page.goto("https://app.member.virginpulse.com/#/home")
+  await page.goto("https://app.personifyhealth.com/#/home")
   await sleep(randomWaitTime())
   await page.waitForSelector("id=earned-value")
   const points = await page.locator("id=earned-value").innerText()
@@ -65,8 +64,8 @@ export const fillHealthyHabitsPage = async (page: Page) => {
     try {
       await detectModal(page)
       await func(page)
-    } catch(error: any) {
+    } catch (error: any) {
       logger(`caught error: ${error.message}`)
-    }  
+    }
   }
 }
