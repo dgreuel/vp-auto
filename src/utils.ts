@@ -1,8 +1,14 @@
-import nodemailer from "nodemailer"
-import { Message, SMTPClient } from "emailjs"
-import fs from "fs"
+import fs from "node:fs";
+import nodemailer from "nodemailer";
+import { Message, SMTPClient } from "emailjs";
 
-const logs = []
+const logs = [] as string[];
+
+type Screenshots = {
+  type: string;
+  name: string;
+  path: string;
+};
 
 export const sendMail = async (points: string) => {
   if (process.env.EMAIL_HOST && process.env.EMAIL_USER) {
@@ -10,50 +16,52 @@ export const sendMail = async (points: string) => {
       user: process.env.EMAIL_USER,
       password: process.env.EMAIL_PASS,
       host: process.env.EMAIL_HOST,
-      port: parseInt(process.env.EMAIL_PORT),
+      port: Number.parseInt(process.env.EMAIL_PORT ?? "465", 10),
       ssl: true,
-    })
+    });
 
-    // create attachments array of screenshots
-    const attachments = []
+    // Create attachments array of screenshots
+    const attachments = [] as Screenshots[];
     if (fs.existsSync("./screenshots")) {
-      fs.readdirSync("./screenshots").forEach((file) => {
+      for (const file of fs.readdirSync("./screenshots")) {
         attachments.push({
           type: "image/png",
           name: file,
           path: `./screenshots/${file}`,
-        })
-      })
+        });
+      }
     }
 
-    // send email
-    const messageOpts = {
-      text: `Virgin Pulse Logs (${points}): \n` + logs.join("\n"), // plain text body
-      from: process.env.EMAIL_USER, // sender address
-      to: process.env.EMAIL_RECPT || process.env.EMAIL_USER, // list of receivers
+    // Send email
+    const messageOptions = {
+      text: `Virgin Pulse Logs (${points}): \n` + logs.join("\n"), // Plain text body
+      from: process.env.EMAIL_USER, // Sender address
+      to: process.env.EMAIL_RECPT ?? process.env.EMAIL_USER, // List of receivers
       subject: `Virgin Pulse Stats: ${points}`, // Subject line
-      attachment: attachments, // attachments
-    }
-    const message = new Message(messageOpts)
+      attachment: attachments, // Attachments
+    };
+    const message = new Message(messageOptions);
 
     try {
-      const msg = await client.sendAsync(message)
-      console.log(msg)
-    } catch (e) {
-      console.log("Failed to send email")
-      console.log(e)
+      const message_ = await client.sendAsync(message);
+      console.log(message_);
+    } catch (error) {
+      console.log("Failed to send email");
+      console.log(error);
     }
-    // console.log("Message sent: %s", info.messageId)
+    // Console.log("Message sent: %s", info.messageId)
   } else {
-    console.log("No Valid Email Vars detected -- skipping...  ")
+    console.log("No Valid Email Vars detected -- skipping...  ");
   }
-}
+};
 
-export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-// random wait time between 1 and 2 seconds
-export const randomWaitTime = (): number => 1000 + Math.random() * 2000
+export const sleep = async (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms)); // eslint-disable-line no-promise-executor-return
 
-export const logger = (msg: string) => {
-  logs.push(msg)
-  console.log(msg)
-}
+// Random wait time between 1 and 2 seconds
+export const randomWaitTime = (): number => 1000 + Math.random() * 2000;
+
+export const logger = (message: string) => {
+  logs.push(message);
+  console.log(message);
+};
