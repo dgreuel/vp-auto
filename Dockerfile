@@ -12,4 +12,6 @@ COPY ./ ./
 
 RUN npm run build
 
+RUN npx playwright install --with-deps --only-shell chromium
+
 ENTRYPOINT npm run start
