@@ -6,7 +6,7 @@ import {
   setupBrowser,
   goToStatsPage,
   goToHomePageAndGetPoints,
-} from "./virgin-pulse.js";
+} from "./personify.js";
 
 const runtime = async () => {
   const { browser, page } = await setupBrowser(

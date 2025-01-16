@@ -34,10 +34,10 @@ export const sendMail = async (points: string) => {
 
     // Send email
     const messageOptions = {
-      text: `Virgin Pulse Logs (${points}): \n` + logs.join("\n"), // Plain text body
+      text: `Personify Logs (${points}): \n` + logs.join("\n"), // Plain text body
       from: process.env.EMAIL_USER, // Sender address
       to: process.env.EMAIL_RECPT ?? process.env.EMAIL_USER, // List of receivers
-      subject: `Virgin Pulse Stats: ${points}`, // Subject line
+      subject: `Personify Stats: ${points}`, // Subject line
       attachment: attachments, // Attachments
     };
     const message = new Message(messageOptions);
